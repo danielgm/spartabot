@@ -39,14 +39,16 @@ func main() {
 }
 
 func hook(res http.ResponseWriter, req *http.Request) {
+	fmt.Println("hooked")
 	if req.Method == "POST" {
 		msg := parseSlackMessage(req.Body)
-		fmt.Println(msg.user_id, msg.user_name)
+		fmt.Println("user ID: " + msg.user_id)
+		fmt.Println("user name: " + msg.user_name)
 		if lovesJustinBieber(msg) {
 			log.Printf(
 				"#%s user:%s (%s), \"%s\" (\"%s\")\n",
 				msg.channel_name, msg.user_id, msg.user_name, msg.text, msg.trigger_word)
-			fmt.Fprintf(res, "{\"text\": \"Oh, I love you, too, @%s.\"}", msg.user_name)
+			fmt.Fprintf(res, "{\"text\": \"Oh, I love you, too, %s.\"}", msg.user_name)
 		}
 	}
 }
@@ -61,6 +63,7 @@ func parseSlackMessage(body io.Reader) SlackMessage {
 
 	m := make(map[string]string)
 	for _, line := range lines {
+		fmt.Println("> " + line)
 		tokens := strings.Split(line, "=")
 		if len(tokens) > 1 {
 			key, value := tokens[0], tokens[1]
