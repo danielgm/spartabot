@@ -1,29 +1,15 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 )
-
-type SlackMessage struct {
-	token        string
-	team_id      string
-	team_domain  string
-	channel_id   string
-	channel_name string
-	timestamp    float64
-	user_id      string
-	user_name    string
-	text         string
-	trigger_word string
-}
 
 var bieberLovePattern *regexp.Regexp
 
@@ -41,56 +27,25 @@ func main() {
 func hook(res http.ResponseWriter, req *http.Request) {
 	fmt.Println("hooked")
 	if req.Method == "POST" {
-		msg := parseSlackMessage(req.Body)
-		fmt.Println("user ID: " + msg.user_id)
-		fmt.Println("user name: " + msg.user_name)
-		if lovesJustinBieber(msg) {
+		buffer := new(bytes.Buffer)
+		buffer.ReadFrom(req.Body)
+		msg, err := url.ParseQuery(buffer.String())
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println("user ID: " + msg["user_id"][0])
+		fmt.Println("user name: " + msg["user_name"][0])
+		if lovesJustinBieber(msg["text"][0]) {
 			log.Printf(
 				"#%s user:%s (%s), \"%s\" (\"%s\")\n",
-				msg.channel_name, msg.user_id, msg.user_name, msg.text, msg.trigger_word)
-			fmt.Fprintf(res, "{\"text\": \"Oh, I love you, too, %s.\"}", msg.user_name)
+				msg["channel_name"][0], msg["user_id"][0], msg["user_name"][0], msg["text"][0], msg["trigger_word"][0])
+			fmt.Fprintf(res, "{\"text\": \"Oh, I love you, too, @%s.\"}", msg["user_name"][0])
 		}
 	}
 }
 
-func parseSlackMessage(body io.Reader) SlackMessage {
-	var lines []string
-
-	scanner := bufio.NewScanner(body)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-
-	m := make(map[string]string)
-	for _, line := range lines {
-		fmt.Println("> " + line)
-		tokens := strings.Split(line, "=")
-		if len(tokens) > 1 {
-			key, value := tokens[0], tokens[1]
-			m[key] = value
-		}
-	}
-
-	timestamp, err := strconv.ParseFloat(m["timestamp"], 64)
-	if err != nil {
-		timestamp = 0
-	}
-
-	return SlackMessage{
-		m["token"],
-		m["team_id"],
-		m["team_domain"],
-		m["channel_id"],
-		m["channel_name"],
-		timestamp,
-		m["user_id"],
-		m["user_name"],
-		m["text"],
-		m["trigger_word"],
-	}
-}
-
-func lovesJustinBieber(msg SlackMessage) bool {
-	text := strings.ToLower(msg.text)
+func lovesJustinBieber(text string) bool {
+	text = strings.ToLower(text)
 	return bieberLovePattern.MatchString(text)
 }
