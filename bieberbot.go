@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -24,7 +25,11 @@ type SlackMessage struct {
 	trigger_word string
 }
 
+var bieberLovePattern *regexp.Regexp
+
 func main() {
+	bieberLovePattern = regexp.MustCompile(`i love[^.!?]*(justin)?bieber`)
+
 	http.HandleFunc("/hook", hook)
 	fmt.Println("listening...")
 	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
@@ -36,10 +41,13 @@ func main() {
 func hook(res http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
 		msg := parseSlackMessage(req.Body)
-		log.Printf(
-			"#%s user:%s (%s), \"%s\" (\"%s\")\n",
-			msg.channel_name, msg.user_id, msg.user_name, msg.text, msg.trigger_word)
-		fmt.Fprintf(res, "{\"text\": \"Oh, I love you, too, @%s.\"}", msg.user_name)
+		fmt.Println(msg.user_id, msg.user_name)
+		if lovesJustinBieber(msg) {
+			log.Printf(
+				"#%s user:%s (%s), \"%s\" (\"%s\")\n",
+				msg.channel_name, msg.user_id, msg.user_name, msg.text, msg.trigger_word)
+			fmt.Fprintf(res, "{\"text\": \"Oh, I love you, too, @%s.\"}", msg.user_name)
+		}
 	}
 }
 
@@ -77,4 +85,9 @@ func parseSlackMessage(body io.Reader) SlackMessage {
 		m["text"],
 		m["trigger_word"],
 	}
+}
+
+func lovesJustinBieber(msg SlackMessage) bool {
+	text := strings.ToLower(msg.text)
+	return bieberLovePattern.MatchString(text)
 }
