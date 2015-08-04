@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -35,7 +36,10 @@ func main() {
 func hook(res http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
 		msg := parseSlackMessage(req.Body)
-		fmt.Fprintf(res, "{\"text\": \"I love you, too, @%s.\"}", msg.user_name)
+		log.Printf(
+			"#%s user:%s (%s), \"%s\" (\"%s\")\n",
+			msg.channel_name, msg.user_id, msg.user_name, msg.text, msg.trigger_word)
+		fmt.Fprintf(res, "{\"text\": \"Oh, I love you, too, @%s.\"}", msg.user_name)
 	}
 }
 
