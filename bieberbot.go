@@ -11,10 +11,15 @@ import (
 	"strings"
 )
 
-var bieberLovePattern *regexp.Regexp
+var (
+	bieberLovePattern *regexp.Regexp
+	slackToken        string
+)
 
 func main() {
 	bieberLovePattern = regexp.MustCompile(`i love[^.!?]*(justin)?bieber`)
+	slackToken = os.Getenv("SLACK_TOKEN")
+	log.Printf("Using Slack token: %s", slackToken)
 
 	http.HandleFunc("/hook", hook)
 	log.Println("Looking for Bieber love...")
@@ -27,10 +32,10 @@ func main() {
 func hook(res http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
 		msg := parseRequest(req)
-		if msg != nil {
+		if msg != nil && msg["token"][0] == slackToken {
 			lovesBieber := lovesJustinBieber(msg["text"][0])
 			log.Printf("Love found! user=%s, channel=%s, bieber=%t, text=\"%s\"", msg["user_name"][0], msg["channel_name"][0], lovesBieber, msg["text"][0])
-			if lovesBieber {
+			if msg["user_name"][0] != "slackbot" && lovesBieber {
 				fmt.Fprintf(res, "{\"text\": \"I love you, too, @%s.\"}", msg["user_name"][0])
 			}
 		}
