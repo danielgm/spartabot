@@ -17,7 +17,7 @@ var (
 )
 
 func main() {
-	bieberLovePattern = regexp.MustCompile(`i love[^.!?]*(justin)?bieber`)
+	bieberLovePattern = regexp.MustCompile(`i (love|:heart:)[^.!?]*(justin)?bieber`)
 	slackToken = os.Getenv("SLACK_TOKEN")
 	log.Printf("Using Slack token: %s", slackToken)
 
