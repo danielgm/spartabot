@@ -11,6 +11,8 @@ As per company tradition, all unlocked and unattended computers will be used to 
 
 ![Leo getting some Bieber love!](https://raw.githubusercontent.com/danielgm/bieberbot/master/screenies/leo.png)
 
+![Daniel and Bieber sittin’ in a tree...](https://raw.githubusercontent.com/danielgm/bieberbot/master/screenies/daniel.png)
+
 ![Kathy and Bieber omg!](https://raw.githubusercontent.com/danielgm/bieberbot/master/screenies/kathy.png)
 
 ![Bieber loves Miguel, too!](https://raw.githubusercontent.com/danielgm/bieberbot/master/screenies/miguel.png)
