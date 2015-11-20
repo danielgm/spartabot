@@ -12,17 +12,17 @@ import (
 )
 
 var (
-	bieberLovePattern *regexp.Regexp
-	slackToken        string
+	spartaPattern *regexp.Regexp
+	slackToken    string
 )
 
 func main() {
-	bieberLovePattern = regexp.MustCompile(`i (love|:heart:)[^.!?]*(justin)?(bieber|beiber)`)
+	spartaPattern = regexp.MustCompile(`spartans!`)
 	slackToken = os.Getenv("SLACK_TOKEN")
 	log.Printf("Using Slack token: %s", slackToken)
 
 	http.HandleFunc("/hook", hook)
-	log.Println("Looking for Bieber love...")
+	log.Println("Listening for Spartans...")
 	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
 		panic(err)
@@ -30,13 +30,14 @@ func main() {
 }
 
 func hook(res http.ResponseWriter, req *http.Request) {
-	if req.Method == "POST" {
+	if isValidRequest(req) {
 		msg := parseRequest(req)
-		if msg != nil && msg["token"][0] == slackToken {
-			lovesBieber := lovesJustinBieber(msg["text"][0])
-			log.Printf("Love found! user=%s, channel=%s, bieber=%t, text=\"%s\"", msg["user_name"][0], msg["channel_name"][0], lovesBieber, msg["text"][0])
-			if msg["user_name"][0] != "slackbot" && lovesBieber {
-				fmt.Fprintf(res, "{\"text\": \"I love you, too, @%s.\"}", msg["user_name"][0])
+		if isValidMessage(msg) {
+			requestText := getMessageText(msg)
+			responseText := getResponseText(requestText)
+			if len(responseText) > 0 {
+				log.Printf("Matched! user=%s, channel=%s, text=\"%s\"", msg["user_name"][0], msg["channel_name"][0], msg["text"][0])
+				fmt.Fprintf(res, "{\"text\": \"%s.\"}", responseText)
 			}
 		}
 	}
@@ -54,7 +55,26 @@ func parseRequest(req *http.Request) map[string][]string {
 	return msg
 }
 
-func lovesJustinBieber(text string) bool {
-	text = strings.ToLower(text)
-	return bieberLovePattern.MatchString(text)
+func isValidRequest(req *http.Request) bool {
+	return req.Method == "POST"
+}
+
+func isValidMessage(msg map[string][]string) bool {
+	return msg != nil && msg["token"][0] == slackToken
+}
+
+func getMessageText(msg map[string][]string) string {
+	return msg["text"][0]
+}
+
+func getResponseText(msg string) string {
+	msg = strings.ToLower(msg)
+	if isSpartans(msg) {
+		return "Awoo! Awoo! Awoo!"
+	}
+	return ""
+}
+
+func isSpartans(text string) bool {
+	return spartaPattern.MatchString(text)
 }
