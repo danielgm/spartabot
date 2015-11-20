@@ -25,7 +25,7 @@ func main() {
 	patternResponseMap[regexp.MustCompile(`give them nothing`)] = "But take from them everything!"
 	patternResponseMap[regexp.MustCompile(`our arrows will blot out the sun`)] = "Then we will fight in the shade!"
 	patternResponseMap[regexp.MustCompile(`there is much our cultures could share`)] = "Haven't you noticed? We've been sharing our culture with you all morning."
-	patternResponseMap[regexp.MustCompile(`spartans`)] = "Awoo! Awoo! Awoo!"
+	patternResponseMap[regexp.MustCompile(`spartaa*ns`)] = "Awoo! Awoo! Awoo!"
 
 	slackToken = os.Getenv("SLACK_TOKEN")
 	log.Printf("Using Slack token: %s", slackToken)
