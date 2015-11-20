@@ -18,14 +18,14 @@ var (
 
 func main() {
 	patternResponseMap = make(map[*regexp.Regexp]string)
+	patternResponseMap[regexp.MustCompile(`what is your profession`)] = "Awoo! Awoo! Awoo!"
+	patternResponseMap[regexp.MustCompile(`respect and honor`)] = "Respect and honor"
+	patternResponseMap[regexp.MustCompile(`respect and honour`)] = "Respect and honour"
+	patternResponseMap[regexp.MustCompile(`this is madness`)] = "Madness? This is Sparta!"
+	patternResponseMap[regexp.MustCompile(`give them nothing`)] = "But take from them everything!"
+	patternResponseMap[regexp.MustCompile(`our arrows will blot out the sun`)] = "Then we will fight in the shade!"
+	patternResponseMap[regexp.MustCompile(`there is much our cultures could share`)] = "Haven't you noticed? We've been sharing our culture with you all morning."
 	patternResponseMap[regexp.MustCompile(`spartans`)] = "Awoo! Awoo! Awoo!"
-	patternResponseMap[regexp.MustCompile(`What is your profession`)] = "Awoo! Awoo! Awoo!"
-	patternResponseMap[regexp.MustCompile(`Respect and honor`)] = "Respect and honor"
-	patternResponseMap[regexp.MustCompile(`Respect and honour`)] = "Respect and honour"
-	patternResponseMap[regexp.MustCompile(`This is madness`)] = "Madness? This is Sparta!"
-	patternResponseMap[regexp.MustCompile(`Give them nothing`)] = "But take from them everything!"
-	patternResponseMap[regexp.MustCompile(`Our arrows will blot out the sun`)] = "Then we will fight in the shade!"
-	patternResponseMap[regexp.MustCompile(`There is much our cultures could share`)] = "Haven't you noticed? We've been sharing our culture with you all morning."
 
 	slackToken = os.Getenv("SLACK_TOKEN")
 	log.Printf("Using Slack token: %s", slackToken)
