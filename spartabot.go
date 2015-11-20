@@ -17,6 +17,7 @@ var (
 )
 
 func main() {
+	patternResponseMap = make(map[*regexp.Regexp]string)
 	patternResponseMap[regexp.MustCompile(`spartans`)] = "Awoo! Awoo! Awoo!"
 	patternResponseMap[regexp.MustCompile(`What is your profession`)] = "Awoo! Awoo! Awoo!"
 	patternResponseMap[regexp.MustCompile(`Respect and honor`)] = "Respect and honor"
