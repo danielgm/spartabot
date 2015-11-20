@@ -69,7 +69,7 @@ func isValidRequest(req *http.Request) bool {
 }
 
 func isValidMessage(msg map[string][]string) bool {
-	return msg != nil && msg["token"][0] == slackToken
+	return msg != nil && msg["token"][0] == slackToken && msg["user_name"][0] != "slackbot"
 }
 
 func getMessageText(msg map[string][]string) string {
