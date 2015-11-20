@@ -1,1 +1,1 @@
-web: bieberbot
+web: spartabot
