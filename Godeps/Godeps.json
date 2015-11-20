@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/danielgm/bieberbot",
+	"ImportPath": "github.com/danielgm/spartabot",
 	"GoVersion": "go1.4.2",
 	"Deps": []
 }
