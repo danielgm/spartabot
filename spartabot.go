@@ -12,12 +12,20 @@ import (
 )
 
 var (
-	spartaPattern *regexp.Regexp
-	slackToken    string
+	patternResponseMap map[*regexp.Regexp]string
+	slackToken         string
 )
 
 func main() {
-	spartaPattern = regexp.MustCompile(`spartans!`)
+	patternResponseMap[regexp.MustCompile(`spartans`)] = "Awoo! Awoo! Awoo!"
+	patternResponseMap[regexp.MustCompile(`What is your profession`)] = "Awoo! Awoo! Awoo!"
+	patternResponseMap[regexp.MustCompile(`Respect and honor`)] = "Respect and honor"
+	patternResponseMap[regexp.MustCompile(`Respect and honour`)] = "Respect and honour"
+	patternResponseMap[regexp.MustCompile(`This is madness`)] = "Madness? This is Sparta!"
+	patternResponseMap[regexp.MustCompile(`Give them nothing`)] = "But take from them everything!"
+	patternResponseMap[regexp.MustCompile(`Our arrows will blot out the sun`)] = "Then we will fight in the shade!"
+	patternResponseMap[regexp.MustCompile(`There is much our cultures could share`)] = "Haven't you noticed? We've been sharing our culture with you all morning."
+
 	slackToken = os.Getenv("SLACK_TOKEN")
 	log.Printf("Using Slack token: %s", slackToken)
 
@@ -37,7 +45,7 @@ func hook(res http.ResponseWriter, req *http.Request) {
 			responseText := getResponseText(requestText)
 			if len(responseText) > 0 {
 				log.Printf("Matched! user=%s, channel=%s, text=\"%s\"", msg["user_name"][0], msg["channel_name"][0], msg["text"][0])
-				fmt.Fprintf(res, "{\"text\": \"%s.\"}", responseText)
+				fmt.Fprintf(res, "{\"text\": \"%s\"}", responseText)
 			}
 		}
 	}
@@ -69,12 +77,10 @@ func getMessageText(msg map[string][]string) string {
 
 func getResponseText(msg string) string {
 	msg = strings.ToLower(msg)
-	if isSpartans(msg) {
-		return "Awoo! Awoo! Awoo!"
+	for pattern, response := range patternResponseMap {
+		if pattern.MatchString(msg) {
+			return response
+		}
 	}
 	return ""
-}
-
-func isSpartans(text string) bool {
-	return spartaPattern.MatchString(text)
 }
